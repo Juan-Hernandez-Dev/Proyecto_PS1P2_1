@@ -8,7 +8,7 @@ Este proyecto es un Blackjack simple desarrollado en C++ que utiliza la bibliote
 2. **Vinculación**: Los archivos objeto en `build/` se vinculan para generar el ejecutable final, `app.exe`, que se coloca en el directorio `bin/`.
 
 ## Script de Construcción (`run.bat`)
-El script `build.bat` automatiza los siguientes pasos:
+El script `run.bat` automatiza los siguientes pasos:
 1. **Creación del directorio `build/`**: Si no existe, el script crea el directorio `build/` para almacenar los archivos objeto compilados.
 2. **Compilación**: El script compila todos los archivos fuente C++ (`.cpp`) desde el directorio `src/` en archivos objeto.
 3. **Vinculación**: Una vez que todos los archivos objeto han sido compilados, se vinculan para generar el ejecutable (`app.exe`) en el directorio `bin/`.
