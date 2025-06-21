@@ -4,6 +4,8 @@
 #include <ctime>
 #include <algorithm>
 #include <random>
+#include <algorithm>
+#include <random>
 using namespace std;
 
 const int TOTAL_CARTAS = 52;
@@ -59,24 +61,6 @@ int main() {
     Carta mazo[TOTAL_CARTAS];
     generarCartas(mazo);
     mezclarCartas(mazo);
-
-    int cartasRestantes = TOTAL_CARTAS;
-    int opcion;
-
-    do {
-        cout << "\nMenú:\n1. Robar carta\n2. Salir\nOpción: ";
-        cin >> opcion;
-
-        if (opcion == 1) {
-            if (cartasRestantes > 0) {
-                Carta robada = robarCarta(mazo, cartasRestantes);
-                cout << "Robaste: " << nombreCarta(robada.valor.numero) << " de " << robada.palo << endl;
-            } else {
-                cout << "No quedan cartas en el mazo." << endl;
-            }
-        }
-    } while (opcion != 2);
-
-    cout << "Programa finalizado." << endl;
+    mostrarCartas(mazo);
     return 0;
 }
