@@ -2,8 +2,8 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
-#include <algorithm>  // para shuffle
-#include <random>     // para random_device y mt19937
+#include <algorithm>
+#include <random>
 using namespace std;
 
 const int TOTAL_CARTAS = 52;
@@ -53,11 +53,24 @@ void mezclarCartas(Carta mazo[]) {
     shuffle(mazo, mazo + TOTAL_CARTAS, g);
 }
 
+Carta robarCarta(Carta mazo[], int &cartasRestantes) {
+    if (cartasRestantes == 0) {
+        cout << "No quedan cartas en el mazo." << endl;
+        exit(0);
+    }
+    return mazo[--cartasRestantes];
+}
+
 int main() {
     srand(time(0));
     Carta mazo[TOTAL_CARTAS];
     generarCartas(mazo);
     mezclarCartas(mazo);
-    mostrarCartas(mazo);
+
+    int cartasRestantes = TOTAL_CARTAS;
+
+    Carta robada = robarCarta(mazo, cartasRestantes);
+    cout << "Robaste: " << nombreCarta(robada.valor.numero) << " de " << robada.palo << endl;
+
     return 0;
 }
