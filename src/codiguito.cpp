@@ -4,8 +4,6 @@
 #include <ctime>
 #include <algorithm>
 #include <random>
-#include <algorithm>
-#include <random>
 using namespace std;
 
 const int TOTAL_CARTAS = 52;
@@ -42,6 +40,13 @@ void generarCartas(Carta mazo[]) {
     }
 }
 
+void mostrarCartas(Carta mazo[]) {
+    for (int i = 0; i < TOTAL_CARTAS; i++) {
+        cout << "Carta " << i + 1 << ": ";
+        cout << nombreCarta(mazo[i].valor.numero) << " de " << mazo[i].palo << endl;
+    }
+}
+
 void mezclarCartas(Carta mazo[]) {
     random_device rd;
     mt19937 g(rd());
@@ -61,6 +66,11 @@ int main() {
     Carta mazo[TOTAL_CARTAS];
     generarCartas(mazo);
     mezclarCartas(mazo);
-    mostrarCartas(mazo);
+
+    int cartasRestantes = TOTAL_CARTAS;
+
+    Carta robada = robarCarta(mazo, cartasRestantes);
+    cout << "Robaste: " << nombreCarta(robada.valor.numero) << " de " << robada.palo << endl;
+
     return 0;
 }
