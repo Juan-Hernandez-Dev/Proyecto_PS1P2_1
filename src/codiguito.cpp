@@ -2,8 +2,8 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
-#include <algorithm>  // para shuffle
-#include <random>     // para random_device y mt19937
+#include <algorithm>
+#include <random>
 using namespace std;
 
 const int TOTAL_CARTAS = 52;
@@ -40,17 +40,18 @@ void generarCartas(Carta mazo[]) {
     }
 }
 
-void mostrarCartas(Carta mazo[]) {
-    for (int i = 0; i < TOTAL_CARTAS; i++) {
-        cout << "Carta " << i + 1 << ": ";
-        cout << nombreCarta(mazo[i].valor.numero) << " de " << mazo[i].palo << endl;
-    }
-}
-
 void mezclarCartas(Carta mazo[]) {
     random_device rd;
     mt19937 g(rd());
     shuffle(mazo, mazo + TOTAL_CARTAS, g);
+}
+
+Carta robarCarta(Carta mazo[], int &cartasRestantes) {
+    if (cartasRestantes == 0) {
+        cout << "No quedan cartas en el mazo." << endl;
+        exit(0);
+    }
+    return mazo[--cartasRestantes];
 }
 
 int main() {
@@ -58,6 +59,24 @@ int main() {
     Carta mazo[TOTAL_CARTAS];
     generarCartas(mazo);
     mezclarCartas(mazo);
-    mostrarCartas(mazo);
+
+    int cartasRestantes = TOTAL_CARTAS;
+    int opcion;
+
+    do {
+        cout << "\nMenú:\n1. Robar carta\n2. Salir\nOpción: ";
+        cin >> opcion;
+
+        if (opcion == 1) {
+            if (cartasRestantes > 0) {
+                Carta robada = robarCarta(mazo, cartasRestantes);
+                cout << "Robaste: " << nombreCarta(robada.valor.numero) << " de " << robada.palo << endl;
+            } else {
+                cout << "No quedan cartas en el mazo." << endl;
+            }
+        }
+    } while (opcion != 2);
+
+    cout << "Programa finalizado." << endl;
     return 0;
 }
