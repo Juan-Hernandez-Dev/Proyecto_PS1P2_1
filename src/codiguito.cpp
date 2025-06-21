@@ -4,9 +4,8 @@
 #include <ctime>
 #include <algorithm>
 #include <random>
+#include <vector>
 using namespace std;
-
-const int TOTAL_CARTAS = 52;
 
 union ValorCarta {
     int numero;
@@ -28,49 +27,52 @@ string nombreCarta(int valor) {
     }
 }
 
-void generarCartas(Carta mazo[]) {
+vector<Carta> generarCartas() {
+    vector<Carta> mazo;
     string palos[] = {"Picas", "Treboles", "Corazones", "Diamantes"};
-    int indice = 0;
     for (int i = 0; i < 4; i++) {
         for (int valor = 1; valor <= 13; valor++) {
-            mazo[indice].valor.numero = valor;
-            mazo[indice].palo = palos[i];
-            indice++;
+            Carta c;
+            c.valor.numero = valor;
+            c.palo = palos[i];
+            mazo.push_back(c);
         }
     }
+    return mazo;
 }
 
-void mostrarCartas(Carta mazo[]) {
-    for (int i = 0; i < TOTAL_CARTAS; i++) {
-        cout << "Carta " << i + 1 << ": ";
-        cout << nombreCarta(mazo[i].valor.numero) << " de " << mazo[i].palo << endl;
-    }
-}
-
-void mezclarCartas(Carta mazo[]) {
+void mezclarCartas(vector<Carta> &mazo) {
     random_device rd;
     mt19937 g(rd());
-    shuffle(mazo, mazo + TOTAL_CARTAS, g);
+    shuffle(mazo.begin(), mazo.end(), g);
 }
 
-Carta robarCarta(Carta mazo[], int &cartasRestantes) {
-    if (cartasRestantes == 0) {
-        cout << "No quedan cartas en el mazo." << endl;
-        exit(0);
-    }
-    return mazo[--cartasRestantes];
+Carta robarCarta(vector<Carta> &mazo) {
+    Carta robada = mazo.back();
+    mazo.pop_back();
+    return robada;
 }
 
 int main() {
     srand(time(0));
-    Carta mazo[TOTAL_CARTAS];
-    generarCartas(mazo);
+    vector<Carta> mazo = generarCartas();
     mezclarCartas(mazo);
+    int opcion;
 
-    int cartasRestantes = TOTAL_CARTAS;
+    do {
+        cout << "\nMenú:\n1. Robar carta\n2. Salir\nOpción: ";
+        cin >> opcion;
 
-    Carta robada = robarCarta(mazo, cartasRestantes);
-    cout << "Robaste: " << nombreCarta(robada.valor.numero) << " de " << robada.palo << endl;
+        if (opcion == 1) {
+            if (!mazo.empty()) {
+                Carta robada = robarCarta(mazo);
+                cout << "Robaste: " << nombreCarta(robada.valor.numero) << " de " << robada.palo << endl;
+            } else {
+                cout << "No quedan cartas en el mazo." << endl;
+            }
+        }
+    } while (opcion != 2);
 
+    cout << "Programa finalizado." << endl;
     return 0;
 }
