@@ -79,4 +79,4 @@ El archivo `utils.h` contiene varias funciones útiles:
 
 ---
 
-Disfruta del juego de Blackjack! 🃏
+Disfruta del juego! 🃏
