@@ -27,7 +27,7 @@ void printTitle(const std::string& message) {
 }
 
 void printSubTitle(const std::string& message) {
-    std::cout << ORANGE << message << RESET << std::endl;
+    std::cout << CYAN << BOLD << message << RESET << std::endl;
 }
 
 void printWarning(const std::string& message) {
