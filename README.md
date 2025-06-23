@@ -77,14 +77,6 @@ El archivo `utils.h` contiene varias funciones útiles:
 - `printWarning(texto)`: Muestra una advertencia en amarillo
 - `askForInput(prompt)`: Solicita entrada al usuario con un mensaje
 
-## 🤝 Contribuciones
-
-Las contribuciones son bienvenidas. Siéntete libre de abrir un issue o enviar un pull request.
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más información.
-
 ---
 
 Disfruta del juego de Blackjack! 🃏
