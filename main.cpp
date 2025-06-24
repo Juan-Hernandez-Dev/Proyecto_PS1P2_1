@@ -3,8 +3,14 @@
 #include <cstdlib>
 #include <ctime>
 #include <Windows.h>
+#include <fstream>
+#include <chrono>
+#include <iomanip>
+#include "json.hpp" 
 #include "include/utils.h"
+
 using namespace std;
+using json = nlohmann::json;
 
 const int TOTAL_CARTAS = 52;
 
@@ -74,7 +80,6 @@ void mostrarCarta(Carta carta) {
     string color = (carta.palo == "Corazones" || carta.palo == "Diamantes") ? RED : WHITE;
     
     cout << "[" << nombreCarta(carta.numero) << " " << color << simbolo << RESET << "]";
-    
 }
 
 int Valordecartas(Carta carta){
@@ -137,7 +142,6 @@ void mostrarEstadoJuego(Carta *dealer, int cantDealer, Carta *jugador, int cantJ
     clearScreen();
     printTitle("BLACKJACK");
     
-    // Mostrar mano del dealer
     printSubTitle("\nDealer's hand:");
     mostrarMano(dealer, cantDealer, ocultarPrimeraDealer);
     if (!ocultarPrimeraDealer) {
@@ -146,7 +150,6 @@ void mostrarEstadoJuego(Carta *dealer, int cantDealer, Carta *jugador, int cantJ
         cout << "  (?? points)" << endl;
     }
     
-    // Mostrar mano del jugador
     printSubTitle("Your hand:");
     mostrarMano(jugador, cantJugador);
     cout << "  (" << calcularPuntaje(jugador, cantJugador) << " points)" << "\n" << endl;
@@ -238,8 +241,65 @@ void quiengana(Carta *jugador, int cantidaddeljugador, Carta *dealer, int cantid
     }
 }
 
-// Devuelve true si el jugador quiere seguir jugando, false si quiere salir
-bool jugarPartida() {
+// ------------ JSON PART STARTS HERE ------------------
+
+string getCurrentDateTime() {
+    auto now = chrono::system_clock::now();
+    time_t timeNow = chrono::system_clock::to_time_t(now);
+    tm localTime;
+#ifdef _WIN32
+    localtime_s(&localTime, &timeNow);
+#else
+    localtime_r(&timeNow, &localTime);
+#endif
+    char buffer[20];
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &localTime);
+    return string(buffer);
+}
+
+string cardToString(Carta carta) {
+    return nombreCarta(carta.numero) + " " + obtenerSimboloPalo(carta.palo);
+}
+
+void saveGame(string playerName, Carta* player, int playerCount, Carta* dealer, int dealerCount, string result) {
+    json game;
+
+    game["date"] = getCurrentDateTime();
+    game["player"]["name"] = playerName;
+
+    for (int i = 0; i < playerCount; i++) {
+        game["player"]["cards"].push_back(cardToString(player[i]));
+    }
+
+    for (int i = 0; i < dealerCount; i++) {
+        game["dealer"]["cards"].push_back(cardToString(dealer[i]));
+    }
+
+    game["result"] = result;
+
+    json history;
+    ifstream inputFile("games.json");
+    if (inputFile.is_open()) {
+        try {
+            inputFile >> history;
+        } catch (...) {
+            history = json::array();
+        }
+        inputFile.close();
+    } else {
+        history = json::array();
+    }
+
+    history.push_back(game);
+
+    ofstream outputFile("games.json");
+    outputFile << setw(4) << history;
+    outputFile.close();
+}
+
+// ------------ JSON PART ENDS HERE ------------------
+
+bool playGame(string playerName) {
     Carta mazo[TOTAL_CARTAS];
     generarCartas(mazo);
     mezclarVariasVeces(mazo, 5);
@@ -251,63 +311,69 @@ bool jugarPartida() {
     int indiceMazo = 0;
     bool continuarJugando = true;
     
-    // Repartir cartas iniciales
     for (int i = 0; i < 2; i++) {
         agregarCarta(jugador, cantidadJugador, mazo[indiceMazo++]);
         agregarCarta(dealer, cantidadDealer, mazo[indiceMazo++]);
     }
     
-    // Mostrar estado inicial del juego
     mostrarEstadoJuego(dealer, cantidadDealer, jugador, cantidadJugador);
     
-    // Turno del jugador
     turnoJugador(jugador, cantidadJugador, mazo, indiceMazo, dealer, cantidadDealer, continuarJugando);
     
-    // Si el jugador no salió y no se pasó, turno del dealer
     if (continuarJugando && calcularPuntaje(jugador, cantidadJugador) <= 21) {
-        // Mostrar la mano completa del dealer
         mostrarEstadoJuego(dealer, cantidadDealer, jugador, cantidadJugador, false);
-        
-        // Turno del dealer
         turnoDealer(dealer, cantidadDealer, mazo, indiceMazo, jugador, cantidadJugador);
-        
-        // Mostrar resultado final
         mostrarEstadoJuego(dealer, cantidadDealer, jugador, cantidadJugador, false);
         quiengana(jugador, cantidadJugador, dealer, cantidadDealer);
         Sleep(2000);
     }
-    
-    // Liberar memoria
+
+    // Save game result
+    string finalResult;
+    int playerScore = calcularPuntaje(jugador, cantidadJugador);
+    int dealerScore = calcularPuntaje(dealer, cantidadDealer);
+
+    if (playerScore > 21) finalResult = "Player busted";
+    else if (dealerScore > 21) finalResult = "Dealer busted - Player wins";
+    else if (playerScore > dealerScore) finalResult = "Player wins";
+    else if (playerScore < dealerScore) finalResult = "Dealer wins";
+    else finalResult = "Draw";
+
+    saveGame(playerName, jugador, cantidadJugador, dealer, cantidadDealer, finalResult);
+
     delete[] jugador;
     delete[] dealer;
-    
+
     return continuarJugando;
 }
 
 int main() {
-    #ifdef _WIN32
-        SetConsoleOutputCP(CP_UTF8);
-    #endif
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+#endif
     
     srand(time(0));
+
+    string playerName;
+    printTitle("Welcome to Blackjack!");
+    askForInput("Please enter your name: ");
+    getline(cin, playerName);
+
+    bool keepPlaying = true;
     
-    bool continuarJugando = true;
-    
-    while (continuarJugando) {
+    while (keepPlaying) {
         clearScreen();
-        printTitle("Welcome to Blackjack!");
-        printInfo("Dealing cards...");
+        printTitle("Starting game...");
         Sleep(1500);
         clearScreen();
-        continuarJugando = jugarPartida();
+        keepPlaying = playGame(playerName);
         
-        if (continuarJugando) {
+        if (keepPlaying) {
             printInfo("Starting a new game...");
-            Sleep(1500); // Pequeña pausa antes de limpiar la pantalla
+            Sleep(1500);
         }
     }
-    
-    printInfo("Thanks for playing! See you next time.\n");
-    
+
+    printInfo("Thanks for playing!");
     return 0;
 }
