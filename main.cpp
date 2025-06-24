@@ -241,7 +241,6 @@ void quiengana(Carta *jugador, int cantidaddeljugador, Carta *dealer, int cantid
     }
 }
 
-// ------------ JSON PART STARTS HERE ------------------
 
 string getCurrentDateTime() {
     auto now = chrono::system_clock::now();
