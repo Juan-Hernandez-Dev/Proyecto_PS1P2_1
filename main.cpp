@@ -296,7 +296,6 @@ void saveGame(string playerName, Carta* player, int playerCount, Carta* dealer, 
     outputFile.close();
 }
 
-// ------------ JSON PART ENDS HERE ------------------
 
 bool playGame(string playerName) {
     Carta mazo[TOTAL_CARTAS];
@@ -327,7 +326,6 @@ bool playGame(string playerName) {
         Sleep(2000);
     }
 
-    // Save game result
     string finalResult;
     int playerScore = calcularPuntaje(jugador, cantidadJugador);
     int dealerScore = calcularPuntaje(dealer, cantidadDealer);
