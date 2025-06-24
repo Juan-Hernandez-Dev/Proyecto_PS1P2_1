@@ -1,5 +1,5 @@
 @echo off
-chcp 65001 //para que acepte los caracteres UTF-8 en el run.bat
+chcp 65001
 setlocal
 
 if not exist build\ (
