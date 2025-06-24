@@ -6,11 +6,11 @@
 #include <fstream>
 #include <chrono>
 #include <iomanip>
-#include "json.hpp" 
+#include "json.hpp" //para usar el archivo JSON
 #include "include/utils.h"
 
 using namespace std;
-using json = nlohmann::json;
+using json = nlohmann::json; // Para manejar JSON
 
 const int TOTAL_CARTAS = 52;
 
